@@ -29,3 +29,12 @@ class ApiKeyOut(BaseModel):
     owner: str
     key_prefix: str
     api_key: str
+
+class BlockIpRequest(BaseModel):
+    ip: str
+    ttl_seconds: int | None = Field(default=None, ge=1, le=7 * 24 * 3600)
+    reason: str = "manual"
+
+
+class KillSwitchRequest(BaseModel):
+    enabled: bool

@@ -12,7 +12,10 @@ class Settings(BaseSettings):
     safe_browsing_api_key: str = ""
 
     links_per_key_per_day: int = 100
-    requests_per_key_per_day:int = 120
+    requests_per_ip_per_minute: int = 120
+
+    default_block_ttl_seconds: int = 900  
+    trust_proxy_headers: bool = False
 
 @lru_cache
 def get_settings()-> Settings:

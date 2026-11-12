@@ -12,6 +12,7 @@ from app.db import get_db
 from app.models import ApiKey, Link
 from app.schemas import LinkCreate, LinkOut, LinkStats
 from app.security import require_api_key
+from app.guard import check_key_quota
 
 ALPHABET = string.ascii_letters + string.digits
 
@@ -33,6 +34,7 @@ def create_link(
     api_key: ApiKey = Depends(require_api_key),
     db: Session = Depends(get_db),
 ):
+    check_key_quota(api_key.id)
     url = str(payload.url)
     for _ in range(5):
         link = Link(code=_new_code(), target_url=url, api_key_id=api_key.id)
