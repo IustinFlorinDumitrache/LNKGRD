@@ -9,10 +9,11 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.db import get_db
+from app.guard import check_key_quota
 from app.models import ApiKey, Link
+from app.safebrowsing import UrlChecker, get_url_checker
 from app.schemas import LinkCreate, LinkOut, LinkStats
 from app.security import require_api_key
-from app.guard import check_key_quota
 
 ALPHABET = string.ascii_letters + string.digits
 
@@ -33,9 +34,14 @@ def create_link(
     payload: LinkCreate,
     api_key: ApiKey = Depends(require_api_key),
     db: Session = Depends(get_db),
+    checker: UrlChecker = Depends(get_url_checker),
 ):
     check_key_quota(api_key.id)
+
     url = str(payload.url)
+    if not checker.is_safe(url):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "URL flagged as unsafe by Safe Browsing")
+
     for _ in range(5):
         link = Link(code=_new_code(), target_url=url, api_key_id=api_key.id)
         db.add(link)
