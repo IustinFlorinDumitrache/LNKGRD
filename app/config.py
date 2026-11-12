@@ -6,6 +6,7 @@ class Settings(BaseSettings):
 
 
     database_url: str
+    base_url: str = "http://localhost:8000"
     redis_url: str = "reddis://localhost:6379/0"
     admin_token: str = ""
     safe_browsing_api_key: str = ""
